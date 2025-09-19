@@ -1,20 +1,21 @@
-const {  publicEncrypt, privateDecrypt } = require('crypto');
+const { publicEncrypt, privateDecrypt } = require('crypto');
 const { publicKey, privateKey } = require('./keypair');
 
-const message = 'the british are coming!'
+function asymmetricEncrypt(message) {
+    const encryptedData = publicEncrypt(
+        publicKey,
+        Buffer.from(message)
+    );
+    return encryptedData.toString('hex');
+}
 
-const encryptedData = publicEncrypt(
-    publicKey,
-    Buffer.from(message)
-  );
+function asymmetricDecrypt(encryptedHex) {
+    const encryptedBuffer = Buffer.from(encryptedHex, 'hex');
+    const decryptedData = privateDecrypt(
+        privateKey,
+        encryptedBuffer
+    );
+    return decryptedData.toString('utf-8');
+}
 
-
-console.log(encryptedData.toString('hex'))
-
-
-const decryptedData = privateDecrypt(
-    privateKey,
-    encryptedData
-);
-
-console.log(decryptedData.toString('utf-8'));
+module.exports = { asymmetricEncrypt, asymmetricDecrypt };

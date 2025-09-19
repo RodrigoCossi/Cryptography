@@ -23,6 +23,10 @@ function signup(email, password) {
 function login(email, password) {
     // simulated database fetch
     const user = DATABASE_USERS.find(user => user.email === email)
+    
+    if (!user) {
+        return 'User not found!'
+    }
 
     // salt could be fetched from DB, used to hash inputed password, and compare if both passwords are equal.
     const [salt, stored_saltedHashPassword] = user.password.split(':');
@@ -38,4 +42,6 @@ function login(email, password) {
         return 'login fail!'
     }
 }
+
+module.exports = { saltedHash, signup, login, DATABASE_USERS };
 
