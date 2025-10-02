@@ -23,6 +23,8 @@ This project contains:
 3. Start the server: `npm start`
 4. Open your browser to `http://localhost:3000`
 
+For detailed Crystals-Kyber usage examples, see [examples/kyber-usage.md](examples/kyber-usage.md).
+
 ## Usage
 
 ### Web Interface
