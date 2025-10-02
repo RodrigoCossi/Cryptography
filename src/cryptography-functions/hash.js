@@ -9,11 +9,8 @@
 const { createHash } = require('crypto');
 
 function hash(input) {
-    const updatedHashObject =createHash('sha256').update(input);
-    console.log(updatedHashObject)
-
     const hashedString = createHash('sha256').update(input).digest('hex');
-    console.log(hashedString)
-
     return hashedString;
 }
+
+module.exports = { hash };
