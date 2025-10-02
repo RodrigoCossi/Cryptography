@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Cryptography Interactive Tools</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Cryptography Interactive Tools</h1>
+            <p class="subtitle">Explore various cryptographic operations with an intuitive interface</p>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <h2>Input Message</h2>
+                <textarea id="inputMessage" placeholder="Enter your message here..."></textarea>
+            </section>
+
+            <section class="operations-grid">
+                <div class="operation-category">
+                    <h3>🔑 Hash Functions</h3>
+                    <button class="btn" onclick="performOperation('hash')">SHA-256 Hash</button>
+                    <button class="btn" onclick="performOperation('saltedHash')">Salted Hash</button>
+                    <button class="btn" onclick="performOperation('hmac')">HMAC</button>
+                </div>
+
+                <div class="operation-category">
+                    <h3>🔒 Symmetric Encryption</h3>
+                    <button class="btn" onclick="performOperation('symmetricEncrypt')">Encrypt (AES-256)</button>
+                    <button class="btn" onclick="performOperation('symmetricDecrypt')">Decrypt (AES-256)</button>
+                </div>
+
+                <div class="operation-category">
+                    <h3>🔑 Asymmetric Encryption</h3>
+                    <button class="btn" onclick="performOperation('asymmetricEncrypt')">Encrypt (RSA)</button>
+                    <button class="btn" onclick="performOperation('asymmetricDecrypt')">Decrypt (RSA)</button>
+                </div>
+
+                <div class="operation-category">
+                    <h3>✍️ Digital Signatures</h3>
+                    <button class="btn" onclick="performOperation('sign')">Sign Message</button>
+                    <button class="btn" onclick="performOperation('verify')">Verify Signature</button>
+                </div>
+
+                <div class="operation-category">
+                    <h3>👤 User Authentication</h3>
+                    <button class="btn" onclick="performOperation('signup')">Sign Up</button>
+                    <button class="btn" onclick="performOperation('login')">Login</button>
+                </div>
+            </section>
+
+            <section class="results-section">
+                <h2>Results</h2>
+                <div id="results" class="results-content">
+                    <p class="placeholder">Results will appear here after performing cryptographic operations...</p>
+                </div>
+                <div class="results-actions">
+                    <button class="btn-secondary" onclick="clearResults()">Clear Results</button>
+                    <button class="btn-secondary" onclick="copyResults()">Copy Results</button>
+                </div>
+            </section>
+
+            <section class="chain-section">
+                <h2>🔗 Chain Operations</h2>
+                <p class="chain-description">Apply multiple cryptographic operations in sequence:</p>
+                <div class="chain-buttons">
+                    <button class="btn-chain" onclick="performChain('hash-hmac-encrypt-sign')">Hash → HMAC → Encrypt → Sign</button>
+                    <button class="btn-chain" onclick="performChain('hash-symmetric')">Hash → Symmetric Encrypt</button>
+                    <button class="btn-chain" onclick="performChain('sign-asymmetric')">Sign → Asymmetric Encrypt</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
