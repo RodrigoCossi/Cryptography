@@ -8,5 +8,8 @@
     "start": "node index.js"
   },
   "author": "RodrigoCossi",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "crystals-kyber-js": "^2.5.0"
+  }
 }

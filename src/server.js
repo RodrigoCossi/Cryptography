@@ -12,6 +12,7 @@ const { hmac } = require('./cryptography-functions/hmac');
 const { symmetricEncrypt, symmetricDecrypt } = require('./cryptography-functions/symmetric-encryption');
 const { asymmetricEncrypt, asymmetricDecrypt } = require('./cryptography-functions/assymmetric-encryption');
 const { signMessage, verifySignature } = require('./cryptography-functions/sign');
+const { generateKyberKeyPair, kyberEncrypt, kyberDecrypt, getKeyInfo } = require('./cryptography-functions/kyber-encryption');
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -45,7 +46,7 @@ function handleApiRequest(req, res, parsedUrl) {
             body += chunk.toString();
         });
 
-        req.on('end', () => {
+        req.on('end', async () => {
             try {
                 const data = JSON.parse(body);
                 let result = {};
@@ -121,6 +122,40 @@ function handleApiRequest(req, res, parsedUrl) {
                             result = { message: login(data.email, data.password) };
                         } catch (error) {
                             result = { error: 'Login failed: ' + error.message };
+                        }
+                        break;
+                    
+                    case '/api/kyberGenerateKeys':
+                        try {
+                            result = await generateKyberKeyPair();
+                            result.info = getKeyInfo();
+                        } catch (error) {
+                            result = { error: 'Key generation failed: ' + error.message };
+                        }
+                        break;
+                    
+                    case '/api/kyberEncrypt':
+                        try {
+                            result = await kyberEncrypt(data.message);
+                        } catch (error) {
+                            result = { error: 'Kyber encryption failed: ' + error.message };
+                        }
+                        break;
+                    
+                    case '/api/kyberDecrypt':
+                        try {
+                            const decrypted = await kyberDecrypt(data.encrypted, data.ciphertext, data.iv);
+                            result = { decrypted };
+                        } catch (error) {
+                            result = { error: 'Kyber decryption failed: ' + error.message };
+                        }
+                        break;
+                    
+                    case '/api/kyberInfo':
+                        try {
+                            result = getKeyInfo();
+                        } catch (error) {
+                            result = { error: 'Failed to get key info: ' + error.message };
                         }
                         break;
                     

@@ -10,6 +10,7 @@ This project contains:
 - **HMAC**: Hash-based Message Authentication Code
 - **Symmetric Encryption**: AES-256 encryption and decryption
 - **Asymmetric Encryption**: RSA encryption and decryption  
+- **Quantum-Resistant Encryption**: Crystals-Kyber (ML-KEM-768) post-quantum encryption
 - **Digital Signatures**: RSA-SHA256 message signing and verification
 - **User Authentication**: Signup and login with salted password hashing
 - **Chain Operations**: Apply multiple cryptographic operations in sequence
@@ -21,6 +22,8 @@ This project contains:
 2. Install dependencies: `npm install`
 3. Start the server: `npm start`
 4. Open your browser to `http://localhost:3000`
+
+For detailed Crystals-Kyber usage examples, see [examples/kyber-usage.md](examples/kyber-usage.md).
 
 ## Usage
 
@@ -41,6 +44,7 @@ The application provides an intuitive web interface where you can:
 - **HMAC**: Generate Hash-based Message Authentication Code
 - **AES-256 Encryption/Decryption**: Symmetric encryption with automatic key generation
 - **RSA Encryption/Decryption**: Asymmetric encryption using generated key pairs
+- **Crystals-Kyber Encryption/Decryption**: Post-quantum secure encryption using ML-KEM-768
 - **Digital Signatures**: Sign messages and verify signatures
 - **User Authentication**: Demonstrate secure signup/login flows
 
@@ -62,14 +66,47 @@ The application provides REST API endpoints for programmatic access:
 - `POST /api/symmetricDecrypt` - AES-256 decryption
 - `POST /api/asymmetricEncrypt` - RSA encryption
 - `POST /api/asymmetricDecrypt` - RSA decryption
+- `POST /api/kyberGenerateKeys` - Generate Crystals-Kyber key pair
+- `POST /api/kyberEncrypt` - Quantum-resistant encryption
+- `POST /api/kyberDecrypt` - Quantum-resistant decryption
+- `POST /api/kyberInfo` - Get information about current Kyber keys
 - `POST /api/sign` - Digital signature
 - `POST /api/verify` - Signature verification
 - `POST /api/signup` - User registration
 - `POST /api/login` - User authentication
 
+## Quantum-Resistant Encryption
+
+This project now includes **Crystals-Kyber** (ML-KEM-768), a quantum-resistant encryption algorithm that is part of NIST's Post-Quantum Cryptography standardization (FIPS 203). 
+
+### Why Quantum-Resistant Cryptography?
+
+Traditional encryption methods like RSA and ECC are vulnerable to attacks from quantum computers. Crystals-Kyber provides:
+
+- **Post-Quantum Security**: Resistant to attacks from both classical and quantum computers
+- **NIST Standardized**: Part of the NIST Post-Quantum Cryptography standard (ML-KEM)
+- **High Performance**: Fast key generation, encryption, and decryption
+- **Security Level 3**: Equivalent to AES-192 security
+
+### Usage Example
+
+```javascript
+// Generate Kyber key pair
+const keys = await generateKyberKeyPair();
+
+// Encrypt a message
+const encrypted = await kyberEncrypt("Secret message");
+// Returns: { encrypted, ciphertext, iv }
+
+// Decrypt the message
+const decrypted = await kyberDecrypt(encrypted.encrypted, encrypted.ciphertext, encrypted.iv);
+// Returns: "Secret message"
+```
+
 ## Technical Details
 
-- **Backend**: Node.js with built-in `crypto` module
+- **Backend**: Node.js with built-in `crypto` module and `crystals-kyber-js`
+- **Quantum Encryption**: ML-KEM-768 (Crystals-Kyber) via `crystals-kyber-js` library
 - **Frontend**: Vanilla HTML5, CSS3, and JavaScript
 - **UI Design**: Modern gradient design with responsive layout
 - **Security**: Uses Node.js crypto best practices
