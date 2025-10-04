@@ -54,12 +54,17 @@ function displayResult(title, content, type = 'normal') {
         placeholder.remove();
     }
     
-    resultsDiv.appendChild(resultItem);
-    
-    // Adjust container height to fit up to four results and then scroll newest into view
+    // Insert newest result at the top
+    if (resultsDiv.firstChild) {
+        resultsDiv.insertBefore(resultItem, resultsDiv.firstChild);
+    } else {
+        resultsDiv.appendChild(resultItem);
+    }
+
+    // Adjust container height to fit up to four results
     adjustResultsHeight();
-    // Ensure the latest item is visible within the scrollable area
-    resultItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Keep the scroll at the top to show newest first
+    resultsDiv.scrollTop = 0;
 }
 
 // Clear results
