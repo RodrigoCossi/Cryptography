@@ -76,15 +76,19 @@ function clearResults() {
 }
 
 // Copy results to clipboard
-function copyResults() {
+function copyResult() {
     const resultsDiv = document.getElementById('results');
-    const text = resultsDiv.innerText;
-    
+    const latest = resultsDiv.querySelector('.result-item');
+    if (!latest) {
+        alert('No results to copy yet.');
+        return;
+    }
+    const text = latest.innerText.trim();
     navigator.clipboard.writeText(text).then(() => {
-        alert('Results copied to clipboard!');
+        alert('Latest result copied to clipboard!');
     }).catch(err => {
         console.error('Failed to copy:', err);
-        alert('Failed to copy results to clipboard');
+        alert('Failed to copy latest result');
     });
 }
 
