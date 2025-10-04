@@ -56,14 +56,18 @@ function displayResult(title, content, type = 'normal') {
     
     resultsDiv.appendChild(resultItem);
     
-    // Scroll to results
-    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Adjust container height to fit up to four results and then scroll newest into view
+    adjustResultsHeight();
+    // Ensure the latest item is visible within the scrollable area
+    resultItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // Clear results
 function clearResults() {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '<p class="placeholder">Results will appear here after performing cryptographic operations...</p>';
+    // Reset any dynamic sizing
+    adjustResultsHeight();
 }
 
 // Copy results to clipboard
@@ -373,4 +377,41 @@ async function performChain(chainType) {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Cryptography Interactive Tools loaded');
+    // Initialize sizing on load (handles placeholder state)
+    adjustResultsHeight();
 });
+
+// Dynamically limit results container height to four result items
+function adjustResultsHeight() {
+    const resultsDiv = document.getElementById('results');
+    if (!resultsDiv) return;
+
+    const items = resultsDiv.querySelectorAll('.result-item');
+    if (!items.length) {
+        // No items: let it be at least the base min-height
+        resultsDiv.style.maxHeight = '';
+        return;
+    }
+
+    // Compute total height for up to first four items, including their margins
+    let total = 0;
+    const count = Math.min(items.length, 4);
+    for (let i = 0; i < count; i++) {
+        const el = items[i];
+        const style = window.getComputedStyle(el);
+        const marginTop = parseFloat(style.marginTop) || 0;
+        const marginBottom = parseFloat(style.marginBottom) || 0;
+        total += el.offsetHeight + marginTop + marginBottom;
+    }
+
+    // Add container paddings to ensure full items fit without being cut off
+    const wrapperStyle = window.getComputedStyle(resultsDiv);
+    const padTop = parseFloat(wrapperStyle.paddingTop) || 0;
+    const padBottom = parseFloat(wrapperStyle.paddingBottom) || 0;
+    const borderTop = parseFloat(wrapperStyle.borderTopWidth) || 0;
+    const borderBottom = parseFloat(wrapperStyle.borderBottomWidth) || 0;
+    const maxHeight = Math.max(150, Math.ceil(total + padTop + padBottom + borderTop + borderBottom));
+
+    // Apply max-height so scrollbar appears after four items
+    resultsDiv.style.maxHeight = `${maxHeight}px`;
+}
