@@ -4,7 +4,10 @@ let storedKeys = {
     symmetricIv: null,
     encryptedData: null,
     signature: null,
-    asymmetricEncrypted: null
+    asymmetricEncrypted: null,
+    kyberEncrypted: null,
+    kyberCiphertext: null,
+    kyberIv: null
 };
 
 // Make API request
@@ -215,6 +218,70 @@ async function performOperation(operation) {
                 } else {
                     displayResult('Login Result:', result.message, 
                         result.message.includes('success') ? 'success' : 'error');
+                }
+                break;
+
+            case 'kyberGenerateKeys':
+                result = await makeApiRequest('kyberGenerateKeys', {});
+                if (result.error) {
+                    displayResult('Key Generation Error:', result.error, 'error');
+                } else {
+                    displayResult('Kyber Key Generation:', 
+                        `✅ Key pair generated successfully!\n\n` +
+                        `Algorithm: ${result.info.algorithm}\n` +
+                        `Security Level: ${result.info.securityLevel}\n` +
+                        `Public Key Length: ${result.info.publicKeyLength} characters\n` +
+                        `Has Key Pair: ${result.info.hasKeyPair}\n\n` +
+                        `Public Key (first 100 chars): ${result.publicKey.substring(0, 100)}...`,
+                        'success');
+                }
+                break;
+
+            case 'kyberEncrypt':
+                result = await makeApiRequest('kyberEncrypt', { message });
+                if (result.error) {
+                    displayResult('Kyber Encryption Error:', result.error, 'error');
+                } else {
+                    storedKeys.kyberEncrypted = result.encrypted;
+                    storedKeys.kyberCiphertext = result.ciphertext;
+                    storedKeys.kyberIv = result.iv;
+                    displayResult('Kyber Encryption:', 
+                        `Encrypted: ${result.encrypted}\n` +
+                        `Ciphertext: ${result.ciphertext.substring(0, 100)}...\n` +
+                        `IV: ${result.iv}\n\n` +
+                        `(Encrypted data, ciphertext, and IV stored for decryption)`,
+                        'success');
+                }
+                break;
+
+            case 'kyberDecrypt':
+                if (!storedKeys.kyberEncrypted || !storedKeys.kyberCiphertext || !storedKeys.kyberIv) {
+                    alert('Please encrypt a message with Kyber first!');
+                    return;
+                }
+                result = await makeApiRequest('kyberDecrypt', {
+                    encrypted: storedKeys.kyberEncrypted,
+                    ciphertext: storedKeys.kyberCiphertext,
+                    iv: storedKeys.kyberIv
+                });
+                if (result.error) {
+                    displayResult('Kyber Decryption Error:', result.error, 'error');
+                } else {
+                    displayResult('Kyber Decryption:', result.decrypted, 'success');
+                }
+                break;
+
+            case 'kyberInfo':
+                result = await makeApiRequest('kyberInfo', {});
+                if (result.error) {
+                    displayResult('Key Info Error:', result.error, 'error');
+                } else {
+                    displayResult('Kyber Key Information:', 
+                        `Algorithm: ${result.algorithm}\n` +
+                        `Security Level: ${result.securityLevel}\n` +
+                        `Public Key Length: ${result.publicKeyLength} characters\n` +
+                        `Has Key Pair: ${result.hasKeyPair}`,
+                        'normal');
                 }
                 break;
 
