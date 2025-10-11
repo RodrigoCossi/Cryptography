@@ -4,9 +4,9 @@ An interactive web application for exploring various cryptographic operations wi
 
 ## Screenshots
 
-![Cryptography Interactive Tools Interface](https://github.com/user-attachments/assets/838c2c36-d1e9-4f4e-b25f-3e7763b1ea3e)
+![Cryptography Interactive Tools Interface](https://github.com/user-attachments/assets/e5928684-028c-49ef-ac3c-5689cf7ec0c6)
 
-![Results and Chain Operations](https://github.com/user-attachments/assets/f7c564c7-bb63-4914-8fd5-5c72becb9c18)
+![Kyber Post-Quantum Encryption in Action](https://github.com/user-attachments/assets/2917be09-f502-4bcb-b1ae-5d76ca3774b7)
 
 ## Features
 
