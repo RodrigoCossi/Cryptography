@@ -32,9 +32,41 @@ async function makeApiRequest(endpoint, data) {
     }
 }
 
+// Display cryptographic parameters
+function displayCryptoParams(params) {
+    const section = document.getElementById('cryptoParamsSection');
+    const paramsDiv = document.getElementById('cryptoParams');
+    
+    if (!params || Object.keys(params).length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    
+    // Show the section
+    section.style.display = 'block';
+    
+    // Build the parameters display
+    let html = '';
+    for (const [key, value] of Object.entries(params)) {
+        html += `
+            <div class="param-item">
+                <span class="param-label">${key}:</span>
+                <span class="param-value">${value}</span>
+            </div>
+        `;
+    }
+    
+    paramsDiv.innerHTML = html;
+}
+
 // Display results
-function displayResult(title, content, type = 'normal') {
+function displayResult(title, content, type = 'normal', cryptoParams = null) {
     const resultsDiv = document.getElementById('results');
+    
+    // Update crypto parameters if provided
+    if (cryptoParams) {
+        displayCryptoParams(cryptoParams);
+    }
     
     // Create result item
     const resultItem = document.createElement('div');
@@ -73,6 +105,8 @@ function clearResults() {
     resultsDiv.innerHTML = '<p class="placeholder">Results will appear here after performing cryptographic operations...</p>';
     // Reset any dynamic sizing
     adjustResultsHeight();
+    // Hide crypto parameters section
+    displayCryptoParams(null);
 }
 
 // Copy results to clipboard
@@ -111,18 +145,39 @@ async function performOperation(operation) {
         switch (operation) {
             case 'hash':
                 result = await makeApiRequest('hash', { message });
-                displayResult('SHA-256 Hash:', result.hash);
+                displayResult('SHA-256 Hash:', result.hash, 'normal',
+                    {
+                        'Algorithm': 'SHA-256',
+                        'Hash Function': 'Secure Hash Algorithm 2',
+                        'Output Length': '64 characters (256 bits hex)',
+                        'Block Size': '512 bits',
+                        'Type': 'Cryptographic Hash Function'
+                    });
                 break;
 
             case 'saltedHash':
                 result = await makeApiRequest('saltedHash', { message });
-                displayResult('Salted Hash:', `Salt: ${result.salt}\nHash: ${result.saltedHashPassword}`);
+                displayResult('Salted Hash:', `Salt: ${result.salt}\nHash: ${result.saltedHashPassword}`, 'normal',
+                    {
+                        'Algorithm': 'SHA-256 with Salt',
+                        'Hash Function': 'SHA-256',
+                        'Salt (Hex)': result.salt,
+                        'Salt Length': '32 characters (128 bits hex)',
+                        'Output Length': '64 characters (256 bits hex)'
+                    });
                 break;
 
             case 'hmac':
                 const secretKey = prompt('Enter a secret key for HMAC:') || 'default-secret-key';
                 result = await makeApiRequest('hmac', { message, secretKey });
-                displayResult('HMAC:', result.hmac);
+                displayResult('HMAC:', result.hmac, 'normal',
+                    {
+                        'Algorithm': 'HMAC-SHA256',
+                        'Hash Function': 'SHA-256',
+                        'Secret Key': secretKey,
+                        'Key Length': `${secretKey.length} characters`,
+                        'Output Length': '64 characters (256 bits hex)'
+                    });
                 break;
 
             case 'symmetricEncrypt':
@@ -132,7 +187,15 @@ async function performOperation(operation) {
                 storedKeys.encryptedData = result.encrypted;
                 displayResult('AES-256 Encryption:', 
                     `Encrypted: ${result.encrypted}\nKey: ${result.key}\nIV: ${result.iv}\n\n(Key and IV stored for decryption)`,
-                    'success');
+                    'success',
+                    {
+                        'Algorithm': 'AES-256-CBC',
+                        'Block Cipher Mode': 'CBC (Cipher Block Chaining)',
+                        'Key Length': '256 bits (32 bytes)',
+                        'IV Length': '128 bits (16 bytes)',
+                        'Key (Hex)': result.key,
+                        'IV (Hex)': result.iv
+                    });
                 break;
 
             case 'symmetricDecrypt':
@@ -148,7 +211,15 @@ async function performOperation(operation) {
                 if (result.error) {
                     displayResult('Decryption Error:', result.error, 'error');
                 } else {
-                    displayResult('AES-256 Decryption:', result.decrypted, 'success');
+                    displayResult('AES-256 Decryption:', result.decrypted, 'success',
+                        {
+                            'Algorithm': 'AES-256-CBC',
+                            'Block Cipher Mode': 'CBC (Cipher Block Chaining)',
+                            'Key Length': '256 bits (32 bytes)',
+                            'IV Length': '128 bits (16 bytes)',
+                            'Key (Hex)': storedKeys.symmetricKey,
+                            'IV (Hex)': storedKeys.symmetricIv
+                        });
                 }
                 break;
 
@@ -158,7 +229,15 @@ async function performOperation(operation) {
                     displayResult('Encryption Error:', result.error, 'error');
                 } else {
                     storedKeys.asymmetricEncrypted = result.encrypted;
-                    displayResult('RSA Encryption:', result.encrypted + '\n\n(Encrypted data stored for decryption)', 'success');
+                    displayResult('RSA Encryption:', result.encrypted + '\n\n(Encrypted data stored for decryption)', 'success',
+                        {
+                            'Algorithm': 'RSA-OAEP',
+                            'Key Type': 'Asymmetric (Public Key)',
+                            'Key Size': '2048 bits',
+                            'Padding': 'OAEP (Optimal Asymmetric Encryption Padding)',
+                            'Hash Function': 'SHA-256 (default)',
+                            'Key Format': 'PEM (SPKI)'
+                        });
                 }
                 break;
 
@@ -171,7 +250,15 @@ async function performOperation(operation) {
                 if (result.error) {
                     displayResult('Decryption Error:', result.error, 'error');
                 } else {
-                    displayResult('RSA Decryption:', result.decrypted, 'success');
+                    displayResult('RSA Decryption:', result.decrypted, 'success',
+                        {
+                            'Algorithm': 'RSA-OAEP',
+                            'Key Type': 'Asymmetric (Private Key)',
+                            'Key Size': '2048 bits',
+                            'Padding': 'OAEP (Optimal Asymmetric Encryption Padding)',
+                            'Hash Function': 'SHA-256 (default)',
+                            'Key Format': 'PEM (PKCS8)'
+                        });
                 }
                 break;
 
@@ -181,7 +268,16 @@ async function performOperation(operation) {
                     displayResult('Signing Error:', result.error, 'error');
                 } else {
                     storedKeys.signature = result.signature;
-                    displayResult('Digital Signature:', result.signature + '\n\n(Signature stored for verification)', 'success');
+                    displayResult('Digital Signature:', result.signature + '\n\n(Signature stored for verification)', 'success',
+                        {
+                            'Algorithm': 'RSA-SHA256',
+                            'Signature Type': 'Digital Signature (PKCS#1 v1.5)',
+                            'Key Type': 'RSA Private Key',
+                            'Key Size': '2048 bits',
+                            'Hash Function': 'SHA-256',
+                            'Signature Format': 'Hex-encoded',
+                            'Key Format': 'PEM (PKCS8)'
+                        });
                 }
                 break;
 
@@ -197,7 +293,16 @@ async function performOperation(operation) {
                     const verified = result.verified;
                     displayResult('Signature Verification:', 
                         verified ? '✅ Signature is valid!' : '❌ Signature is invalid!',
-                        verified ? 'success' : 'error');
+                        verified ? 'success' : 'error',
+                        {
+                            'Algorithm': 'RSA-SHA256',
+                            'Verification Type': 'Digital Signature Verification',
+                            'Key Type': 'RSA Public Key',
+                            'Key Size': '2048 bits',
+                            'Hash Function': 'SHA-256',
+                            'Signature Format': 'Hex-encoded',
+                            'Key Format': 'PEM (SPKI)'
+                        });
                 }
                 break;
 
@@ -263,7 +368,17 @@ async function performOperation(operation) {
                         `Ciphertext: ${result.ciphertext.substring(0, 100)}...\n` +
                         `IV: ${result.iv}\n\n` +
                         `(Encrypted data, ciphertext, and IV stored for decryption)`,
-                        'success');
+                        'success',
+                        {
+                            'Algorithm': 'ML-KEM-768 (Crystals-Kyber)',
+                            'Security Level': 'NIST Level 3 (≈ AES-192)',
+                            'Encryption Mode': 'Hybrid (KEM + AES-256-CBC)',
+                            'Key Encapsulation': 'Lattice-based (quantum-resistant)',
+                            'Data Encryption': 'AES-256-CBC',
+                            'Ciphertext Length': `${result.ciphertext.length} characters (hex)`,
+                            'IV (Hex)': result.iv,
+                            'Shared Secret Size': '32 bytes (256 bits)'
+                        });
                 }
                 break;
 
@@ -280,7 +395,17 @@ async function performOperation(operation) {
                 if (result.error) {
                     displayResult('Kyber Decryption Error:', result.error, 'error');
                 } else {
-                    displayResult('Kyber Decryption:', result.decrypted, 'success');
+                    displayResult('Kyber Decryption:', result.decrypted, 'success',
+                        {
+                            'Algorithm': 'ML-KEM-768 (Crystals-Kyber)',
+                            'Security Level': 'NIST Level 3 (≈ AES-192)',
+                            'Decryption Mode': 'Hybrid (KEM + AES-256-CBC)',
+                            'Key Decapsulation': 'Lattice-based (quantum-resistant)',
+                            'Data Decryption': 'AES-256-CBC',
+                            'Ciphertext Length': `${storedKeys.kyberCiphertext.length} characters (hex)`,
+                            'IV (Hex)': storedKeys.kyberIv,
+                            'Shared Secret Size': '32 bytes (256 bits)'
+                        });
                 }
                 break;
 
