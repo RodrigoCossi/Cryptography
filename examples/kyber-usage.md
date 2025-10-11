@@ -185,6 +185,7 @@ Kyber is designed for high performance:
 | Encryption Speed | Slow | Very Fast |
 | Decryption Speed | Very Slow | Very Fast |
 | NIST Standard | Yes (classical) | Yes (post-quantum) |
+| Security Basis | Integer factorization | Module-LWE (lattice-based) |
 
 ## Future-Proofing
 
