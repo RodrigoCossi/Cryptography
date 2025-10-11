@@ -2,6 +2,12 @@
 
 An interactive web application for exploring various cryptographic operations with an intuitive user interface.
 
+## Screenshots
+
+![Cryptography Interactive Tools Interface](https://github.com/user-attachments/assets/838c2c36-d1e9-4f4e-b25f-3e7763b1ea3e)
+
+![Results and Chain Operations](https://github.com/user-attachments/assets/f7c564c7-bb63-4914-8fd5-5c72becb9c18)
+
 ## Features
 
 This project contains:
@@ -111,9 +117,3 @@ const decrypted = await kyberDecrypt(encrypted.encrypted, encrypted.ciphertext, 
 - **UI Design**: Modern gradient design with responsive layout
 - **Security**: Uses Node.js crypto best practices
 - **Error Handling**: Comprehensive error handling for all operations
-
-## Screenshots
-
-![Cryptography Interactive Tools Interface](https://github.com/user-attachments/assets/838c2c36-d1e9-4f4e-b25f-3e7763b1ea3e)
-
-![Results and Chain Operations](https://github.com/user-attachments/assets/f7c564c7-bb63-4914-8fd5-5c72becb9c18)
