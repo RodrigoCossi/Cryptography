@@ -159,11 +159,12 @@ async function performOperation(operation) {
                 result = await makeApiRequest('saltedHash', { message });
                 displayResult('Salted Hash:', `Salt: ${result.salt}\nHash: ${result.saltedHashPassword}`, 'normal',
                     {
-                        'Algorithm': 'SHA-256 with Salt',
-                        'Hash Function': 'SHA-256',
+                        'Algorithm': 'scrypt with Salt',
+                        'Key Derivation Function': 'scrypt',
+                        'Hash Function': 'SHA-256 (internal)',
                         'Salt (Hex)': result.salt,
                         'Salt Length': '32 characters (128 bits hex)',
-                        'Output Length': '64 characters (256 bits hex)'
+                        'Output Length': '128 characters (512 bits hex)'
                     });
                 break;
 
@@ -319,7 +320,15 @@ async function performOperation(operation) {
                 } else {
                     displayResult('Signup Success:', 
                         `User registered!\nEmail: ${result.email}\nStored hash: ${result.password}`,
-                        'success');
+                        'success',
+                        {
+                            'Algorithm': 'scrypt with Salt',
+                            'Key Derivation Function': 'scrypt',
+                            'Hash Function': 'SHA-256 (internal)',
+                            'Salt Length': '32 characters (128 bits hex)',
+                            'Output Length': '128 characters (512 bits hex)',
+                            'Purpose': 'Password hashing for authentication'
+                        });
                 }
                 break;
 
@@ -335,7 +344,15 @@ async function performOperation(operation) {
                     displayResult('Login Error:', result.error, 'error');
                 } else {
                     displayResult('Login Result:', result.message, 
-                        result.message.includes('success') ? 'success' : 'error');
+                        result.message.includes('success') ? 'success' : 'error',
+                        {
+                            'Algorithm': 'scrypt with Salt',
+                            'Key Derivation Function': 'scrypt',
+                            'Hash Function': 'SHA-256 (internal)',
+                            'Salt Length': '32 characters (128 bits hex)',
+                            'Output Length': '128 characters (512 bits hex)',
+                            'Purpose': 'Password verification using timing-safe comparison'
+                        });
                 }
                 break;
 
