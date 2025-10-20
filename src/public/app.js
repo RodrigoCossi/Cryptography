@@ -10,6 +10,45 @@ let storedKeys = {
     kyberIv: null
 };
 
+// Build metadata object with safe fallbacks
+function buildMetadata(result) {
+    // If metadata is provided by the server, use it
+    if (result.metadata) {
+        return {
+            'Key Derivation Function': result.metadata.kdf || 'unknown',
+            'KDF Parameters': result.metadata.kdfParams || 'default (not exposed)',
+            'Algorithm': result.metadata.algorithm || 'server-determined',
+            'Hash Function': result.metadata.hashFunction || 'not specified',
+            'Salt (Hex)': result.metadata.saltHex || result.salt || 'unknown',
+            'Salt Length': result.metadata.saltLengthBits 
+                ? `${result.metadata.saltLengthBits / 4} characters (${result.metadata.saltLengthBits} bits hex)`
+                : (result.salt ? `${result.salt.length} characters (${result.salt.length * 4} bits hex)` : 'unknown'),
+            'Output Length': result.metadata.outputLengthBits
+                ? `${result.metadata.outputLengthBits / 4} characters (${result.metadata.outputLengthBits} bits hex)`
+                : (result.saltedHashPassword ? `${result.saltedHashPassword.length} characters (${result.saltedHashPassword.length * 4} bits hex)` : 'unknown'),
+            'Purpose': result.metadata.purpose || 'server-determined'
+        };
+    }
+    
+    // Fallback: compute from available data
+    const saltHex = result.salt || 'unknown';
+    const saltLength = result.salt ? result.salt.length : 0;
+    const hashHex = result.saltedHashPassword || result.password || 'unknown';
+    const hashLength = result.saltedHashPassword ? result.saltedHashPassword.length : 
+                      (result.password ? result.password.split(':')[1]?.length || 0 : 0);
+    
+    return {
+        'Key Derivation Function': 'server-determined',
+        'KDF Parameters': 'default (not exposed)',
+        'Algorithm': 'server-determined',
+        'Hash Function': 'not specified',
+        'Salt (Hex)': saltHex,
+        'Salt Length': saltLength ? `${saltLength} characters (${saltLength * 4} bits hex)` : 'unknown',
+        'Output Length': hashLength ? `${hashLength} characters (${hashLength * 4} bits hex)` : 'unknown',
+        'Purpose': 'server-determined'
+    };
+}
+
 // Make API request
 async function makeApiRequest(endpoint, data) {
     try {
@@ -158,13 +197,7 @@ async function performOperation(operation) {
             case 'saltedHash':
                 result = await makeApiRequest('saltedHash', { message });
                 displayResult('Salted Hash:', `Salt: ${result.salt}\nHash: ${result.saltedHashPassword}`, 'normal',
-                    {
-                        'Algorithm': 'SHA-256 with Salt',
-                        'Hash Function': 'SHA-256',
-                        'Salt (Hex)': result.salt,
-                        'Salt Length': '32 characters (128 bits hex)',
-                        'Output Length': '64 characters (256 bits hex)'
-                    });
+                    buildMetadata(result));
                 break;
 
             case 'hmac':
@@ -319,7 +352,8 @@ async function performOperation(operation) {
                 } else {
                     displayResult('Signup Success:', 
                         `User registered!\nEmail: ${result.email}\nStored hash: ${result.password}`,
-                        'success');
+                        'success',
+                        buildMetadata(result));
                 }
                 break;
 
@@ -335,7 +369,8 @@ async function performOperation(operation) {
                     displayResult('Login Error:', result.error, 'error');
                 } else {
                     displayResult('Login Result:', result.message, 
-                        result.message.includes('success') ? 'success' : 'error');
+                        result.success ? 'success' : 'error',
+                        buildMetadata(result));
                 }
                 break;
 

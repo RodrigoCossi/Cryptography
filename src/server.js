@@ -119,7 +119,7 @@ function handleApiRequest(req, res, parsedUrl) {
                     
                     case '/api/login':
                         try {
-                            result = { message: login(data.email, data.password) };
+                            result = login(data.email, data.password);
                         } catch (error) {
                             result = { error: 'Login failed: ' + error.message };
                         }
